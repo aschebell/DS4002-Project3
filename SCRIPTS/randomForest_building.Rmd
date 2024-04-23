@@ -1,0 +1,91 @@
+---
+title: "randomForest_building"
+author: "Jasmine Tang"
+date: "2024-04-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Clean data for model building
+
+```{r}
+
+library(tidyverse)
+
+# import data
+trainingset <- read.csv("/Users/jasminetang/Desktop/trainingset.csv")
+testingset1 <- read.csv("/Users/jasminetang/Desktop/testingset.csv")
+testingset2 <- read.csv("/Users/jasminetang/Desktop/testingset2.csv")
+
+# clean data to be all lowercase
+trainingset <- trainingset[,-1]
+trainingset <- data.frame(lapply(trainingset, tolower))
+colnames(trainingset)[which(colnames(trainingset) == "Type1")] <- "primary_type"
+
+testingset1 <- testingset1[,-1]
+testingset1 <- data.frame(lapply(testingset1, tolower))
+
+testingset2 <- testingset2[,-c(1,4)]
+testingset2 <- data.frame(lapply(testingset2, tolower))
+colnames(testingset2)[which(colnames(testingset2) == "Type1")] <- "primary_type"
+
+# combine the two data sets for testing 
+testingset <- merge(testingset1, testingset2, by = "name")
+
+# combine the two training and testing data sets into one giant data set
+poke_dat <- rbind(trainingset, testingset)
+poke_dat$primary_type <- as.factor(poke_dat$primary_type)
+
+reshaped_df <- poke_dat %>%
+  pivot_longer(cols = starts_with("hex"),
+               names_to = "hex_value",
+               values_to = "hex_color")
+```
+
+# convert hex values into their respective R, G, B numeric values
+
+```{r}
+# convert hex values into RGB numeric values for each of the 7 different hex values of each pokemon
+hex_color <- sapply(reshaped_df$hex_color, col2rgb)
+hex_color <- t(hex_color)
+RGB <- as.data.frame(hex_color)
+colnames(RGB) <- c("R", "G", "B")
+rownames(RGB) <- seq_len(nrow(RGB))
+```
+
+# combine data frames together to create final data set
+
+```{r}
+# combine the data sets
+data <- cbind(reshaped_df, RGB)
+
+# remove the hex value columns and also the pokemon name columns
+final_dat <- data[,-c(1,3,4)]
+```
+
+# create model
+
+```{r}
+set.seed(4002)
+
+# create a 70/30 % training and testing split for our model
+num_obs <- nrow(final_dat)
+num_train <- round(0.7 * num_obs)
+train_indices <- sample(1:num_obs, size = num_train, replace = FALSE)
+train_data <- final_dat[train_indices, ]
+test_data <- final_dat[-train_indices, ]
+
+# create and output our model
+library(randomForest)
+final_dat <- na.omit(final_dat)
+rf_model <- randomForest(primary_type ~ R + G + B, data = train_data)
+print(rf_model)
+
+# make predictions for model accuracy using the test data
+predictions <- predict(rf_model, newdata = test_data)
+accuracy <- sum(predictions == test_data$primary_type) / nrow(test_data)
+print(paste("Accuracy:", round(accuracy, 2)))
+```
