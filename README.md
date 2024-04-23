@@ -1,7 +1,7 @@
 # DS4002-Project3 
 
 ## Contents of Repository
-This repository contains the code and documentation for investigating whether it is possible to predict the primary types of different Pokemon based on the hex color code found in their graphic images. This repository contains a README file, LICENSE file, SCRIPTS folder, DATA folder, and OUTPUT folder. 
+This repository contains the code and documentation for investigating whether it is possible to predict the primary types of different Pokemon based on the hex color codes found in their graphic images. This repository contains a README file, LICENSE file, SCRIPTS folder, DATA folder, and OUTPUT folder. 
 
 ## Section 1: Software and Platform Section
 - Software Used: RStudio (R)
@@ -23,17 +23,10 @@ graph TD;
 ## Section 3: Instructions for Reproducing Results
 
 GET THE DATA:
-1. Download the "baby-names-state" csv file from Data World into your computer
-2. In R, upload the tidyverse, ggplot2, tree, randomForest, dplyr, tidyr, rpart, rpart.plot packages
-3. Read in the CSV data file and save it as a data frame in R
+1. AVERYYYYYY 
 
 CLEAN THE DATA:
-1. Convert the "name," "sex," and "state_abb" columbs to factor data types
-2. Create a "decades" column from the "year" column for each decade of years (ex. 1910-1919)
-3. Create a "region" column from the "state_abb" column for the five regions of the US (ex. Northeast)
-4. Filter data for only rows with a year = 2020 then filter for names with at least 1/3 babies being female and 1/3 babies born being male to determine unisex names
-5. Take the top 10 names from this unisex list based on largest number of babies given the name
-6. Filter entire dataset for only those with names in the top 10 unisex list and save dataframe as UnisexNameData.csv
+1. AVERYYYYYY
 
 CREATE EXPLORATORY PLOTS FOR EDA:
 1. Use ggplot to create different bar plots that will help to visualize our data, where the year is on the x-axis and different variables are on the y-axis for each graph:
