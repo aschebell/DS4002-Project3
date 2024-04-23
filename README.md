@@ -38,20 +38,18 @@ DATA PREP FOR RANDOM FORESTS MODEL BUILDING:
 2. Clean all three data sets so that all character values appear as lowercase
 3. For all three data sets, rename the "Type1" column as "primary_type"
 4. Combine the testingset.csv data frame with the testingset2.csv data frame using the merge() function by "name" (this is the Pokemon name column)
-5. Combine the data frame created in step 4 with the data frame from trainingset.csv using the the rbind() function
+5. Combine the data frame created in step 4 with the data frame from trainingset.csv using the rbind() function
 6. Reshape the total combined data frame from step 5 using the pivot_longer() function so that the hex values appear in columns
-   
-BASIC CLASSIFICATION TREE -- RECURSIVE BINARY SPLITTING:
 
-1. Use the tree::tree(...,data=...) function from the tree library in R to create the first basic classification tree model
-2. Apply summary() to the classification tree created above
-   - This will give you the significant variables used, the number of terminal nodes, the residual mean deviance, and also the misclassification error rate of the model (test error rate!)
-3. Apply plot() and text() to the classification tree created in (1) to view the graphical output
-4. Optional: Use the y response of our data set, the y response of our test data set, the tree we created in (1), the predict() function, and the table() function in R to create a confusion matrix
+CONVERT HEX CODES TO THEIR RESPECTIVE R, G, B NUMERIC VALUES
+
+1. Use the sapply() function in combination with the col2rgb() function to expand each hex code into its respective R, G, B numeric values
+2. Save the respective R, G, B numeric values into the data frame as columns 
+3. Remove the hex code column from the data frame 
 
 CLASSIFICATION TREE USING RPART PACKAGE IN R:
 1. Use the rpart() and rpart.plot() functions from the rpart and rpart.plot packages in R to create classification trees that are more informative and visually appealing than the basic models we created above
-   - The rpart() method can be used on our data set to actually create the classification tree, while the rpart.plot() method is used to output the classification tree graphically
+   - The rpart() method can be used on our data set to actually create the classification tree, while the rpart.plot() method is used to output the classification tree graphicallys
 
 PRUNE THE CLASSIFICATION TREE:
 1. You may need to use the tree::cv.tree() and tree::prune.misclass() functions on our initial basic classification tree model to remove some of the branches, reduce its complexity, or improve its general performance-- pruning a classification tree generally prevents overfitting of the data in the model
