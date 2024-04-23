@@ -15,8 +15,8 @@ This repository contains the code and documentation for investigating whether it
 graph TD;
     README.md;
     LICENSE.md;
-    SCRIPTS-->unisex_names_project.rmd;
-    DATA-->baby-names-state.csv;
+    SCRIPTS-->randomForest_building.rmd;
+    DATA-->pokemon.csv; colorDataPokemon.csv--> trainingset.csv; testingset.csv; testingset2.csv;
     baby-names-state.csv-->UnisexNameData.csv;
     UnisexNameData.csv-->DataAppendix&References;
     OUTPUT-->TotalNumberofBabiesborneachyearwithatop10unisexnamefrom2020bysex.png;
