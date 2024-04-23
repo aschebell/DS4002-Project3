@@ -29,11 +29,9 @@ CLEAN THE DATA:
 1. AVERYYYYYY
 
 CREATE EXPLORATORY PLOTS FOR EDA:
-1. Use ggplot to create different bar plots that will help to visualize our data, where the year is on the x-axis and different variables are on the y-axis for each graph:
-  - Count of babies (y-axis) for each year (x-axis)
-  - Distribution babies by sex (y-axis) for each year (x-axis)
-  - Count of babies for each name (y-axis) for each year (x-axis)
-2. Save these plots into the OUTPUT folder
+1. Use ggplot to create different bar plots that will help to visualize our data, where the Pokemon type is on the x-axis and the frequency of respective Pokemon types are on  the y-axis for each graph
+2. Create sample color palettes and plots for specific Pokemon to see what the hex codes represent (and to display the different hues of color)
+3. Save these plots into the OUTPUT folder
 
 DATA PREP FOR BASIC CLASSIFICATION TREE MODEL BUILDING:
 1. Read in the previously cleaned data as a csv file in R
