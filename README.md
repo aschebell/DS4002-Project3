@@ -1,7 +1,7 @@
-# DS4002-Project3 (**everything below is old and is just a placeholder for the actual repository**)
+# DS4002-Project3 
 
 ## Contents of Repository
-This repository contains the code and documentation for conducting forecasting on unisex baby name trends. This repository contains a README file, LICENSE file, SCRIPTS folder, DATA folder, and OUTPUT folder. 
+This repository contains the code and documentation for investigating whether it is possible to predict the primary types of different Pokemon based on the hex color code found in their graphic images. This repository contains a README file, LICENSE file, SCRIPTS folder, DATA folder, and OUTPUT folder. 
 
 ## Section 1: Software and Platform Section
 - Software Used: RStudio (R)
