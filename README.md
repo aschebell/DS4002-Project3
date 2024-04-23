@@ -5,7 +5,7 @@ This repository contains the code and documentation for investigating whether it
 
 ## Section 1: Software and Platform Section
 - Software Used: RStudio (R)
-- Packages Used: tidyverse, randomForest
+- Packages Used: tidyverse, randomForest,
 - Platform used: Mac
 
 ## Section 2: Map of Documentation 
@@ -15,7 +15,7 @@ This repository contains the code and documentation for investigating whether it
 graph TD;
     README.md;
     LICENSE.md;
-    SCRIPTS-->randomForest_building.rmd;
+    SCRIPTS-->Cleaning&ColorAnalysis.Rmd-->randomForest_building.rmd;
     DATA-->pokemon.csv-->colorDataPokemon.csv-->trainingset.csv-->testingset.csv-->testingset2.csv;
     OUTPUT-->confusion_matrix1.png-->confusion_matrix2.png-->error_rate.png
 ```
