@@ -17,11 +17,7 @@ graph TD;
     LICENSE.md;
     SCRIPTS-->randomForest_building.rmd;
     DATA-->pokemon.csv-->colorDataPokemon.csv-->trainingset.csv-->testingset.csv-->testingset2.csv;
-    OUTPUT-->TotalNumberofBabiesborneachyearwithatop10unisexnamefrom2020bysex.png;
-    TotalNumberofBabiesborneachyearwithatop10unisexnamefrom2020bysex.png-->TotalNumberofBabiesborneachyearwithatop10unisexnamefrom2020bysex.png;
-    TotalNumberofBabiesborneachyearwithatop10unisexnamefrom2020bysex.png-->TotalNumberofBabiesbornbynameeachyearfrom1910-2020withatop10unisexnamefrom2020.png;
-    TotalNumberofBabiesbornbynameeachyearfrom1910-2020withatop10unisexnamefrom2020.png-->TotalNumberofBabiesborneachyearfrom1910to2020andtheirsex.png;
-    TotalNumberofBabiesborneachyearfrom1910to2020andtheirsex.png-->TotalNumberofBabiesborneachyearfrom1910-2020withatop10unisexnamefrom2020.png;
+    OUTPUT-->confusion_matrix1.png-->confusion_matrix2.png-->error_rate.png
 ```
 
 ## Section 3: Instructions for Reproducing Results
