@@ -5,7 +5,7 @@ This repository contains the code and documentation for investigating whether it
 
 ## Section 1: Software and Platform Section
 - Software Used: RStudio (R)
-- Packages Used: tidyverse, randomForest,
+- Packages Used: tidyverse, randomForest, hues, colorfindr
 - Platform used: Mac
 
 ## Section 2: Map of Documentation 
