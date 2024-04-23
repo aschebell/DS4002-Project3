@@ -23,10 +23,21 @@ graph TD;
 ## Section 3: Instructions for Reproducing Results
 
 GET THE DATA:
-1. AVERYYYYYY 
+1. Download the "pokemon" csv and "images" folder from Kaggle onto your computer
+2. Download the "pokemon-images-dataset-by-type" images and folders from GitHub onto your computer
+3. Read in the csv and save as a data frame in R
+4. Read in each folder of images and save as lists in R
 
 CLEAN THE DATA:
-1. AVERYYYYYY
+1. Convert the Type1 and Type2 columns into factors
+2. Create a file list of images for each type folder
+3. In a for loop, get the top 3 most used colors for each Pokemon image in the list
+4. Create a data frame containing these hex values, and filter for the 7 most used colors across all images for each type
+5. Generate a swatch/palette for each type
+6. Combine all palettes into one data frame and save as "colorDataPokemon.csv"
+7. Create training and testing sets using same method as above, this time choosing the top 7 colors for each Pokemon.
+8. Combine training set with Type1 from pokemon.csv
+9. Save these dataframes as "trainingset.csv" and "testingset.csv"
 
 CREATE EXPLORATORY PLOTS FOR EDA:
 1. Use ggplot to create different bar plots that will help to visualize our data, where the Pokemon type is on the x-axis and the frequency of respective Pokemon types are on  the y-axis for each graph
