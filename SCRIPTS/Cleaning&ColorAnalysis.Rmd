@@ -1,0 +1,613 @@
+---
+title: "DSProject3"
+output: html_document
+date: "2024-04-02"
+---
+
+# libraries
+```{r}
+library(tidyverse)
+library(opencv)
+library(raster)
+library(sp)
+library(colorfindr)
+library(keras)
+library(tensorflow)
+library(reticulate)
+library (magick)
+library(purrr)
+library(gifski)
+library(hues)
+library(eyedroppeR)
+```
+
+# Load in the Kaggle Data
+```{r}
+typedf <- read.csv("~/Desktop/DS4002/Project3/pokemon.csv")
+view(typedf)
+```
+
+# Clean the Data
+```{r}
+typedf2 <- typedf
+typedf2$Type1 <- as.factor(typedf2$Type1) #make types factors
+typedf2$Type2 <- as.factor(typedf2$Type2)
+
+#typedf2$primtype <- typedf2$Type1
+
+#levels(typedf2$primtype) = c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18) #
+
+#summary(typedf2$primtype)
+```
+
+```{r}
+#piplupcolors <- get_colors("Project3/images/piplup.png")
+
+#piplupcolors 
+
+#dim(readPNG("Project3/images/piplup.png"))
+```
+
+```{r}
+#install_tensorflow(extra_packages="pillow")
+#install_keras()
+```
+
+```{r}
+#getwd()
+
+#folder = "Project3/images/"
+
+#setwd(folder)
+#getwd()
+
+#file.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+
+#list(file.png)
+```
+
+
+
+
+
+# Randomly generated 216 images (30% of data set) to serve as the testing set. 
+```{r}
+pokemon <- typedf2
+#pokemon <- pokemon %>% mutate_all(na_if,"")
+pokemon <- pokemon[1:721,]
+list_space <- c("1 4 9 13 15 17 18 24 27 32 33 36 41 44 49 50 58 59 64 65 68 69 70 71 72 79 81 83 84 86 90 92 94 96 100 101 105 107 112 113 114 119 122 123 124 127 129 132 134 138 144 148 158 167 170 171 172 178 184 186 187 188 192 196 203 205 210 215 217 219 222 223 227 228 238 239 240 241 245 255 258 262 265 267 269 274 276 277 279 285 292 294 295 298 300 304 305 308 310 322 323 325 326 327 328 333 339 342 352 359 360 361 362 363 370 379 383 384 386 388 389 390 391 394 396 397 398 399 400 402 405 406 409 412 414 415 419 420 422 424 425 426 434 435 437 438 446 449 450 460 464 465 476 478 479 482 486 487 492 493 496 503 516 517 520 521 528 530 532 539 541 556 561 562 565 567 571 577 578 579 580 588 595 596 597 598 607 608 610 611 618 620 622 624 626 632 643 644 650 651 656 659 665 668 673 677 680 687 692 696 700 702 710 711 716 721")
+numbers <- unlist(strsplit(list_space, " "))
+integers <- as.integer(numbers)
+pokemon_test <- pokemon[c(integers),]
+#pokemon_test
+
+```
+
+
+
+# Created color palettes for each Pokemon type for EDA
+
+Flying Primary Type
+```{r}
+folder = "Project3/flying"
+setwd(folder)
+getwd()
+
+images.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+images.png
+
+flyingcolors <- data.frame()
+
+for (i in 1:length(images.png)){
+    #print(i)
+    filecolors <- get_colors(images.png[i], top_n = 3)
+    flyingcolors <- rbind(flyingcolors, filecolors)
+    #swatch(filecolors$col_hex)
+}
+swatch(flyingcolors$col_hex)
+flyingcolors2 <- flyingcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "flying")
+swatch(flyingcolors2$col_hex)
+```
+
+Fairy Primary Type 
+```{r}
+folder = "Project3/fairy"
+setwd(folder)
+getwd()
+
+images.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+images.png 
+
+fairycolors <- data.frame()
+
+for (i in 1:(length(images.png))){ 
+    filecolors <- get_colors(images.png[i], top_n = 3)
+    fairycolors <- rbind(fairycolors, filecolors)
+}
+#swatch(fairycolors$col_hex) # total swatch of all colors
+fairycolors2 <- fairycolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "fairy")
+swatch(fairycolors2$col_hex) #swatch of top 7 most popular colors
+
+```
+
+Ghost Primary Type
+```{r}
+folder = "Project3/ghost"
+setwd(folder)
+getwd()
+
+images.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+images.png
+
+ghostcolors <- data.frame()
+
+for (i in 1:length(images.png)){
+    filecolorsg <- get_colors(images.png[i], top_n = 3)
+    ghostcolors <- rbind(ghostcolors, filecolorsg)
+}
+#swatch(ghostcolors$col_hex)
+ghostcolors2 <- ghostcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "ghost")
+swatch(ghostcolors2$col_hex)
+```
+
+
+Bug Primary Type
+```{r}
+folder = "Project3/bug"
+setwd(folder)
+getwd()
+
+imagesbug.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesbug.png
+
+bugcolors <- data.frame()
+
+for (i in 1:length(imagesbug.png)){
+    filecolorsb <- get_colors(imagesbug.png[i], top_n = 3)
+    bugcolors <- rbind(bugcolors, filecolorsb)
+    #swatch(filecolors$col_hex)
+}
+bugcolors2 <- bugcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "bug")
+swatch(bugcolors2$col_hex)
+```
+
+Dark Primary Type
+```{r}
+folder = "Project3/dark"
+setwd(folder)
+getwd()
+
+imagesdark.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesdark.png
+
+darkcolors <- data.frame()
+
+for (i in 1:length(imagesdark.png)){
+    filecolorsd <- get_colors(imagesdark.png[i], top_n = 3)
+    darkcolors <- rbind(darkcolors, filecolorsd)
+}
+darkcolors2 <- darkcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "dark")
+swatch(darkcolors2$col_hex)
+```
+
+Dragon Primary Type
+```{r}
+folder = "Project3/dragon"
+setwd(folder)
+getwd()
+
+imagesdragon.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesdragon.png
+
+dragoncolors <- data.frame()
+
+for (i in 1:length(imagesdragon.png)){
+    print(imagesdragon.png[i])
+    filecolorsdr <- get_colors(imagesdragon.png[i], top_n = 3)
+    dragoncolors <- rbind(dragoncolors, filecolorsdr)
+}
+dragoncolors2 <- dragoncolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "dragon")
+swatch(dragoncolors2$col_hex)
+```
+
+Electric Primary Type
+```{r}
+folder = "Project3/electric"
+setwd(folder)
+getwd()
+
+imagesele.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesele.png
+
+electriccolors <- data.frame()
+
+for (i in 1:length(imagesele.png)){
+    filecolorsele <- get_colors(imagesele.png[i], top_n = 3)
+    electriccolors <- rbind(electriccolors, filecolorsele)
+}
+#swatch(electriccolors$col_hex)
+electriccolors2 <- electriccolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "electric")
+swatch(electriccolors2$col_hex)
+```
+
+
+Fighting Primary Type
+```{r}
+folder = "Project3/fighting"
+setwd(folder)
+getwd()
+
+imagesfighting.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesfighting.png
+
+fightingcolors <- data.frame()
+
+for (i in 1:length(imagesfighting.png)){
+    filecolorsfighting <- get_colors(imagesfighting.png[i], top_n = 3)
+    fightingcolors <- rbind(fightingcolors, filecolorsfighting)
+}
+fightingcolors2 <- fightingcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "fighting")
+swatch(fightingcolors2$col_hex)
+```
+
+Fire Primary Type
+```{r}
+folder = "Project3/fire"
+setwd(folder)
+getwd()
+
+imagesfire.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesfire.png
+
+firecolors <- data.frame()
+
+for (i in 1:length(imagesfire.png)){
+    filecolorsfire <- get_colors(imagesfire.png[i], top_n = 3)
+    firecolors <- rbind(firecolors, filecolorsfire)
+    #swatch(filecolors$col_hex)
+}
+firecolors2 <- firecolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "fire")
+swatch(firecolors2$col_hex)
+```
+
+Grass Primary Type
+```{r}
+folder = "Project3/grass"
+setwd(folder)
+getwd()
+
+imagesgrass.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesgrass.png
+
+grasscolors <- data.frame()
+
+for (i in 1:length(imagesgrass.png)){
+    filecolorsgrass <- get_colors(imagesgrass.png[i], top_n = 3)
+    grasscolors <- rbind(grasscolors, filecolorsgrass)
+}
+grasscolors2 <- grasscolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "grass")
+swatch(grasscolors2$col_hex)
+```
+
+Ground Primary Type
+```{r}
+folder = "Project3/ground"
+setwd(folder)
+getwd()
+
+imagesgr.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesgr.png
+
+groundcolors <- data.frame()
+
+for (i in 1:length(imagesgr.png)){
+    #print(imagesgr.png[i])
+    filecolorsgr <- get_colors(imagesgr.png[i], top_n = 3)
+    groundcolors <- rbind(groundcolors, filecolorsgr)
+    #swatch(filecolors$col_hex)
+}
+groundcolors2 <- groundcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "ground")
+swatch(groundcolors2$col_hex)
+```
+
+Ice Primary Type
+```{r}
+folder = "Project3/ice"
+setwd(folder)
+getwd()
+
+imagesice.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesice.png
+
+icecolors <- data.frame()
+
+for (i in 1:length(imagesice.png)){
+    print(imagesice.png[i])
+    filecolorsice <- get_colors(imagesice.png[i], top_n = 3)
+    icecolors <- rbind(icecolors, filecolorsice)
+    #swatch(filecolors$col_hex)
+}
+icecolors2 <- icecolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "ice")
+swatch(icecolors2$col_hex)
+```
+
+
+Normal Primary Type
+```{r}
+folder = "Project3/normal"
+setwd(folder)
+getwd()
+
+imagesnormal.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesnormal.png
+
+normalcolors <- data.frame()
+
+for (i in 1:length(imagesnormal.png)){
+    filecolorsnormal <- get_colors(imagesnormal.png[i], top_n = 3)
+    normalcolors <- rbind(normalcolors, filecolorsnormal)
+}
+normalcolors2 <- normalcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "normal")
+swatch(normalcolors2$col_hex)
+```
+
+Poison Primary Type
+```{r}
+folder = "Project3/poison"
+setwd(folder)
+getwd()
+
+imagespoison.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagespoison.png
+
+poisoncolors <- data.frame()
+
+for (i in 1:length(imagespoison.png)){
+    filecolorspoison <- get_colors(imagespoison.png[i], top_n = 3)
+    poisoncolors <- rbind(poisoncolors, filecolorspoison)
+}
+poisoncolors2 <- poisoncolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "poison")
+swatch(poisoncolors2$col_hex)
+```
+
+Psychic Primary Type
+```{r}
+folder = "Project3/psychic"
+setwd(folder)
+getwd()
+
+imagespsychic.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagespsychic.png
+
+psychiccolors <- data.frame()
+
+for (i in 1:length(imagespsychic.png)){
+    filecolorspsychic <- get_colors(imagespsychic.png[i], top_n = 3)
+    psychiccolors <- rbind(psychiccolors, filecolorspsychic)
+}
+psychiccolors2 <- psychiccolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "psychic")
+swatch(psychiccolors2$col_hex)
+```
+
+Rock Primary Type
+```{r}
+folder = "Project3/rock"
+setwd(folder)
+getwd()
+
+imagesrock.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagesrock.png
+
+rockcolors <- data.frame()
+
+for (i in 1:length(imagesrock.png)){
+    filecolorsrock <- get_colors(imagesrock.png[i], top_n = 3)
+    rockcolors <- rbind(rockcolors, filecolorsrock)
+}
+rockcolors2 <- rockcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "rock")
+swatch(rockcolors2$col_hex)
+```
+
+Steel Primary Type
+```{r}
+folder = "Project3/steel"
+setwd(folder)
+getwd()
+
+imagessteel.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagessteel.png
+
+steelcolors <- data.frame()
+
+for (i in 1:length(imagessteel.png)){
+    filecolorssteel <- get_colors(imagessteel.png[i], top_n = 3)
+    steelcolors <- rbind(steelcolors, filecolorssteel)
+}
+steelcolors2 <- steelcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "steel")
+swatch(steelcolors2$col_hex)
+```
+
+Water Primary Type
+```{r}
+folder = "Project3/water"
+setwd(folder)
+getwd()
+
+imageswater.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imageswater.png
+
+watercolors <- data.frame()
+
+for (i in 1:length(imageswater.png)){
+    filecolorswater <- get_colors(imageswater.png[i], top_n = 3)
+    watercolors <- rbind(watercolors, filecolorswater)
+}
+watercolors2 <- watercolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "water")
+swatch(watercolors2$col_hex)
+
+# another palette view
+x1 <- make_palette(watercolors, n = 7, extract_method = "hex_freq")
+x2 <- head(x1, 7)
+plot_colors(watercolors)
+
+```
+
+# all palletes in one data frame
+```{r}
+
+alltypes <-rbind(bugcolors2, darkcolors2)
+alltypes <-rbind(alltypes, dragoncolors2)
+alltypes <-rbind(alltypes, electriccolors2)
+alltypes <-rbind(alltypes, fairycolors2)
+alltypes <-rbind(alltypes, fightingcolors2)
+alltypes <-rbind(alltypes, firecolors2)
+alltypes <-rbind(alltypes, flyingcolors2)
+alltypes <-rbind(alltypes, ghostcolors2)
+alltypes <-rbind(alltypes, grasscolors2)
+alltypes <-rbind(alltypes, groundcolors2)
+alltypes <-rbind(alltypes, normalcolors2)
+alltypes <-rbind(alltypes, poisoncolors2)
+alltypes <-rbind(alltypes, psychiccolors2)
+alltypes <-rbind(alltypes, rockcolors2)
+alltypes <-rbind(alltypes, steelcolors2)
+alltypes <-rbind(alltypes, watercolors2)
+alltypes <-rbind(alltypes, icecolors2)
+
+alltypes
+
+write.csv(alltypes2, "colorDataPokemon.csv")
+```
+
+# Creating palette from testing subset of data
+```{r}
+folder = "Project3/testing"
+setwd(folder)
+getwd()
+
+imagestesting.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagestesting.png
+
+testingcolors <- data.frame()
+
+for (i in 1:length(imagestesting.png)){
+    print(imagestesting.png[i])
+    filecolorstesting <- get_colors(imagestesting.png[i], top_n = 3)
+    testingcolors <- rbind(testingcolors, filecolorstesting)
+    #swatch(filecolors$col_hex)
+}
+swatch(testingcolors$col_hex)
+testingcolors2 <- testingcolors %>% group_by(col_hex) %>% summarize(tot_freq = sum(col_freq)) %>% arrange(desc(tot_freq)) %>% top_n(7) %>% mutate(type = "testing")
+testingcolors2
+swatch(testingcolors2$col_hex)
+```
+
+
+
+-----------
+
+# Generated top 7 colors for each pokemonin the testing data
+```{r}
+folder = "Project3/testing"
+setwd(folder)
+getwd()
+
+imagestesting.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagestesting.png
+
+testingcolors <- data.frame()
+
+for (i in 1:length(imagestesting.png)){
+    #print(imagestesting.png[i])
+    filecolorstesting <- get_colors(imagestesting.png[i], top_n = 7) #, top_n = 1
+    filecolorstestingdf <- filecolorstesting %>% mutate(name = imagestesting.png[i])
+    testingcolors <- rbind(testingcolors, filecolorstestingdf)
+    #swatch(filecolors$col_hex)
+}
+
+testingcolors2 <- testingcolors %>% mutate_at("name", str_replace, "Project3/testing/", "") %>% mutate_at("name", str_replace, ".png", "")
+
+testingcolors4 <- testingcolors3
+testingcolors4 <- testingcolors4[ , !names(testingcolors4) %in% remcolumns]
+
+
+testingcolors2$color <- rep(1:7, length.out = 1498)
+testingcolors3 <- testingcolors2 %>% pivot_wider(names_from = color, values_from =  col_hex)
+testingcolors3 <- as.data.frame(testingcolors3)
+remcolumns <- c("col_freq", "col_share")
+testingcolors4 <- testingcolors3
+testingcolors4 <- testingcolors4[ , !names(testingcolors4) %in% remcolumns]
+testingcolors5 <- testingcolors4 %>% rename(hex1 = "1", hex2 = "2", hex3 = "3", hex4 = "4", hex5 = "5", hex6 = "6", hex7 = "7")
+testingcolors5
+
+testingdata <- testingcolors5 %>%
+   group_by(name) %>% 
+   fill(hex1, hex2, hex3, hex4, hex5, hex6, hex7) %>% 
+   fill(hex1, hex2, hex3, hex4, hex5, hex6, hex7, .direction = 'up') %>%
+   distinct #%>% ungroup()
+testingdata
+
+#testingcolors2 <- testingcolors2 %>% rename(tot_freq = col_freq)
+
+write.csv(testingdata, "testingset.csv")
+```
+
+# redid training using the top 7 colors for each pokemon with their types to train model
+```{r}
+folder = "Project3/training"
+setwd(folder)
+getwd()
+
+imagestraining.png <- list.files(folder, pattern ="*.png", ignore.case = TRUE, full.names = TRUE)
+imagestraining.png
+
+trainingcolors <- data.frame()
+
+for (i in 1:length(imagestraining.png)){
+    filecolorstraining <- get_colors(imagestraining.png[i], top_n = 7)
+    filecolorstrainingdf <- filecolorstraining %>% mutate(name = imagestraining.png[i])
+    trainingcolors <- rbind(trainingcolors, filecolorstrainingdf)
+}
+trainingcolors
+
+trainingcolors2 <- trainingcolors %>% mutate_at("name", str_replace, "Project3/training/", "") %>% mutate_at("name", str_replace, ".png", "")
+
+trainingcolors2 
+
+
+trainingcolors4 <- trainingcolors2
+trainingcolors4 <- trainingcolors4[ , !names(trainingcolors4) %in% remcolumns]
+
+trainingcolors2$color <- rep(1:7, length.out = 3549)
+trainingcolors3 <- trainingcolors2 %>% pivot_wider(names_from = color, values_from =  col_hex)
+trainingcolors3 <- as.data.frame(trainingcolors3)
+remcolumns <- c("col_freq", "col_share")
+trainingcolors4 <- trainingcolors3
+trainingcolors4 <- trainingcolors4[ , !names(trainingcolors4) %in% remcolumns]
+trainingcolors5 <- trainingcolors4 %>% rename(hex1 = "1", hex2 = "2", hex3 = "3", hex4 = "4", hex5 = "5", hex6 = "6", hex7 = "7")
+trainingcolors5
+
+trainingdata <- trainingcolors5 %>%
+   group_by(name) %>% 
+   fill(hex1, hex2, hex3, hex4, hex5, hex6, hex7) %>% 
+   fill(hex1, hex2, hex3, hex4, hex5, hex6, hex7, .direction = 'up') %>%
+   distinct #%>% ungroup()
+trainingdata
+
+typedf2 <- rename(typedf2, name = Name)
+typedf2
+
+trainingdata2 <- merge(trainingdata, typedf2, by = "name")
+trainingdata2
+
+remcolumns <- c("Type2", "Evolution", "primtype")
+trainingdata3 <- trainingdata2[ , !names(trainingdata2) %in% remcolumns]
+trainingdata3
+
+# removing flying type bc only 3 pokemon with primary type of flying
+trainingdata3 <- trainingdata3 %>% filter(Type1 != "Flying")
+trainingdata3 
+
+
+write.csv(trainingdata3, "trainingset.csv")
+```
+
