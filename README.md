@@ -33,15 +33,14 @@ CREATE EXPLORATORY PLOTS FOR EDA:
 2. Create sample color palettes and plots for specific Pokemon to see what the hex codes represent (and to display the different hues of color)
 3. Save these plots into the OUTPUT folder
 
-DATA PREP FOR BASIC CLASSIFICATION TREE MODEL BUILDING:
-1. Read in the previously cleaned data as a csv file in R
-2. Convert the "sex", "name", and "region" variables into factor variable types
-3. Remove unnecessary columns from our current data frame -- this should include the "decades" column (which we won't need for analysis), the first column, and the "stat_abb" column
-4. Use the uncount() function in R where the "weights" argument is set equal to the "count" column to expand our data based on the count column
-   - After this step each row should represent one single baby in our data set
-5. Set the seed using set.seed(4002) --> you can use a random number but make sure to stay consistent throughout the project
-6. Split our data set now into a training and a test data set with a 70/30 split
-
+DATA PREP FOR RANDOM FORESTS MODEL BUILDING:
+1. Read in trainingset.csv, testingset.csv, and testingset2.csv files
+2. Clean all three data sets so that all character values appear as lowercase
+3. For all three data sets, rename the "Type1" column as "primary_type"
+4. Combine the testingset.csv data frame with the testingset2.csv data frame using the merge() function by "name" (this is the Pokemon name column)
+5. Combine the data frame created in step 4 with the data frame from trainingset.csv using the the rbind() function
+6. Reshape the total combined data frame from step 5 using the pivot_longer() function so that the hex values appear in columns
+   
 BASIC CLASSIFICATION TREE -- RECURSIVE BINARY SPLITTING:
 
 1. Use the tree::tree(...,data=...) function from the tree library in R to create the first basic classification tree model
